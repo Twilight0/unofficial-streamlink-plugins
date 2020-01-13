@@ -10,7 +10,7 @@ from streamlink.plugin.api.useragents import CHROME
 from streamlink.exceptions import PluginError
 
 
-class StarGr(Plugin):
+class Star(Plugin):
 
     _url_re = re.compile(r'https?://www\.star\.gr/tv/(?:live-stream|psychagogia|enimerosi)/(?:[\w-]+/v/\d+/.+?/)?')
     _api_url = 'https://www.star.gr/tv/ajax/Atcom.Sites.StarTV.Components.Show.PopupSliderItems?showid={show_id}&type=Episode&itemIndex=0&seasonid={season_id}&single=false'
@@ -68,4 +68,4 @@ class StarGr(Plugin):
             return dict(stream=HTTPStream(self.session, stream, headers=headers))
 
 
-__plugin__ = StarGr
+__plugin__ = Star
