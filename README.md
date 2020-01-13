@@ -22,11 +22,13 @@ Current stream support (X means supported)
 | :------------ | :------------ | :------------ |
 | Ant1 GR | X | X |
 | Ant1 CY | X | X |
+| Ert | WIP | X |
 | Omega CY | X | WIP |
-| Star GR | X | X |
+| Star | X | X |
 | Open TV | X | X |
 | Alpha GR | X | X |
-| Alpha CY | WIP | WIP |
+| Alpha CY | X | X |
+| Sigma | X | X |
 | Dailymotion | X | X |
 | Skai | WIP | X |
 | Euronews | X | X |
