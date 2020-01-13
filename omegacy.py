@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import re
+import re, json
 
 from distutils.util import strtobool
 from streamlink.plugin import Plugin, PluginArgument, PluginArguments
@@ -28,9 +28,9 @@ class OmegaCy(Plugin):
         res = self.session.http.get(self.url, headers=headers)
         tags = list(itertags(res.text, 'script'))
 
-        m3u8 = [i for i in tags if i.text.startswith(u'var playerInstance')][0].text
+        text = [i for i in tags if 'OmegaTvLive' in i.text][0].text
 
-        stream = re.findall('"(.+?)"', m3u8)[1]
+        stream = json.loads(re.search('({.+})', text).group(1))['video']['source']['src']
 
         headers.update({"Referer": self.url})
         del headers['Cookie']
@@ -47,3 +47,4 @@ class OmegaCy(Plugin):
 
 
 __plugin__ = OmegaCy
+
