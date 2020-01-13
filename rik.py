@@ -10,7 +10,7 @@ from streamlink.plugin.api.utils import itertags
 from streamlink.exceptions import NoStreamsError
 
 
-class RikCy(Plugin):
+class Rik(Plugin):
 
     _url_re = re.compile(r'https?://cybc\.com\.cy/(?:live-tv|video-on-demand)/(?:\u03c1\u03b9\u03ba|\xcf\x81\xce\xb9\xce\xba|%CF%81%CE%B9%CE%BA)-\w+/(?:.+?episodes.+?/)?', re.U)
 
@@ -58,4 +58,4 @@ class RikCy(Plugin):
             return dict(stream=HTTPStream(self.session, stream, headers=headers))
 
 
-__plugin__ = RikCy
+__plugin__ = Rik

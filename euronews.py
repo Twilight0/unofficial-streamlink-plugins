@@ -58,7 +58,7 @@ class Euronews(Plugin):
         if parse_hls:
             return HLSStream.parse_variant_playlist(self.session, api_res["primary"])
         else:
-            return dict(live=HTTPStream(self.session, api_res["primary"]))
+            return dict(stream=HTTPStream(self.session, api_res["primary"]))
 
     def _get_streams(self):
         """

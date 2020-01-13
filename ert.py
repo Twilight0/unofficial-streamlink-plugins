@@ -8,7 +8,7 @@ from streamlink.plugin.api.useragents import CHROME
 from streamlink.plugin.api.utils import itertags
 
 
-class ErtGr(Plugin):
+class Ert(Plugin):
 
     _url_re = re.compile(r'https?://webtv\.ert\.gr/[\w-]+/[\w-]+/[\w-]+/')
 
@@ -42,4 +42,4 @@ class ErtGr(Plugin):
             return dict(vod=HTTPStream(self.session, stream, headers=headers))
 
 
-__plugin__ = ErtGr
+__plugin__ = Ert

@@ -62,7 +62,7 @@ class Ant1Cy(Plugin):
         if parse_hls:
             return HLSStream.parse_variant_playlist(self.session, stream, headers=headers)
         else:
-            return dict(live=HTTPStream(self.session, stream, headers=headers))
+            return dict(stream=HTTPStream(self.session, stream, headers=headers))
 
 
 __plugin__ = Ant1Cy

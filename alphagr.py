@@ -51,7 +51,7 @@ class AlphaGr(Plugin):
         if parse_hls and live:
             return HLSStream.parse_variant_playlist(self.session, stream, headers=headers)
         else:
-            return dict(live=HTTPStream(self.session, stream, headers=headers))
+            return dict(stream=HTTPStream(self.session, stream, headers=headers))
 
     def _replace_html_codes(self, txt):
 
