@@ -2,16 +2,15 @@
 import re
 
 from distutils.util import strtobool
-from streamlink.plugin import Plugin, PluginArgument, PluginArguments
+from streamlink.plugin import Plugin, PluginArguments, PluginArgument
 from streamlink.stream import HLSStream, HTTPStream
 from streamlink.plugin.api.useragents import CHROME
 from streamlink.plugin.api.utils import itertags
-from streamlink.compat import urlencode
 
 
-class OmegaCy(Plugin):
+class ErtGr(Plugin):
 
-    _url_re = re.compile(r'https?://www\.omegatv\.com\.cy/live/')
+    _url_re = re.compile(r'https?://webtv\.ert\.gr/[\w-]+/[\w-]+/[\w-]+/')
 
     arguments = PluginArguments(PluginArgument("parse_hls", default='true'))
 
@@ -23,17 +22,14 @@ class OmegaCy(Plugin):
 
         headers = {'User-Agent': CHROME}
 
-        cookie = urlencode(dict(self.session.http.head(self.url, headers={'User-Agent': CHROME}).cookies.items()))
-        headers.update({'Cookie': cookie})
         res = self.session.http.get(self.url, headers=headers)
-        tags = list(itertags(res.text, 'script'))
 
-        m3u8 = [i for i in tags if i.text.startswith(u'var playerInstance')][0].text
+        iframe = list(itertags(res.text, 'iframe'))[0].attributes['src']
 
-        stream = re.findall('"(.+?)"', m3u8)[1]
+        res = self.session.http.get(iframe, headers=headers)
+        stream = re.search(r'var (?:HLSLink|stream) = [\'"](.+?)[\'"]', res.text).group(1)
 
         headers.update({"Referer": self.url})
-        del headers['Cookie']
 
         try:
             parse_hls = bool(strtobool(self.get_option('parse_hls')))
@@ -43,7 +39,7 @@ class OmegaCy(Plugin):
         if parse_hls:
             return HLSStream.parse_variant_playlist(self.session, stream, headers=headers)
         else:
-            return dict(live=HTTPStream(self.session, stream, headers=headers))
+            return dict(vod=HTTPStream(self.session, stream, headers=headers))
 
 
-__plugin__ = OmegaCy
+__plugin__ = ErtGr

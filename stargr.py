@@ -7,12 +7,14 @@ from distutils.util import strtobool
 from streamlink.plugin import Plugin, PluginArguments, PluginArgument
 from streamlink.stream import HLSStream, HTTPStream
 from streamlink.plugin.api.useragents import CHROME
-from streamlink.exceptions import NoStreamsError
+from streamlink.exceptions import PluginError
 
 
 class StarGr(Plugin):
 
-    _url_re = re.compile(r'https?://www\.star\.gr/tv/live-stream/')
+    _url_re = re.compile(r'https?://www\.star\.gr/tv/(?:live-stream|psychagogia|enimerosi)/(?:[\w-]+/v/\d+/.+?/)?')
+    _api_url = 'https://www.star.gr/tv/ajax/Atcom.Sites.StarTV.Components.Show.PopupSliderItems?showid={show_id}&type=Episode&itemIndex=0&seasonid={season_id}&single=false'
+    _player_url = 'https://cdnapisec.kaltura.com/p/713821/sp/0/playManifest/entryId/{0}/format/applehttp/protocol/https/flavorParamId/0/manifest.m3u8'
 
     arguments = PluginArguments(PluginArgument("parse_hls", default='true'))
 
@@ -24,18 +26,34 @@ class StarGr(Plugin):
 
         headers = {'User-Agent': CHROME}
 
-        # if 'live-stream' in self.url:
-        #     live = True
-        # else:
-        #     live = False
+        if 'live-stream' in self.url:
+            live = True
+        else:
+            live = False
 
         res = self.session.http.get(self.url, headers=headers)
 
-        script = [i.text for i in list(itertags(res.text, 'script'))]
+        if live:
 
-        script = [i for i in script if 'm3u8' in i][0]
+            html = [i.text for i in list(itertags(res.text, 'script'))]
 
-        stream = re.search(r"(?P<url>http.+?\.m3u8)", script).group('url')
+            html = [i for i in html if 'm3u8' in i][0]
+
+        else:
+
+            try:
+                show_id, season_id = re.search(r'data-showid="(\d+)".+?data-seasonid="(\d+)"', res.text).groups()
+            except Exception:
+                raise PluginError('Did not match regex patterns to pass into the playable url')
+
+            html = self.session.http.get(self._api_url.format(show_id=show_id, season_id=season_id), headers=headers).text
+
+        stream = re.search(r"(?P<url>http.+?\.m3u8)", html)
+
+        if stream:
+            stream = stream.group(1)
+        else:
+            stream = self._player_url.format(re.search(r'kaltura-player(\w+)', html).group(1))
 
         headers.update({"Referer": self.url})
 
@@ -47,7 +65,7 @@ class StarGr(Plugin):
         if parse_hls:
             return HLSStream.parse_variant_playlist(self.session, stream, headers=headers)
         else:
-            return dict(live=HTTPStream(self.session, stream, headers=headers))
+            return dict(stream=HTTPStream(self.session, stream, headers=headers))
 
 
 __plugin__ = StarGr
