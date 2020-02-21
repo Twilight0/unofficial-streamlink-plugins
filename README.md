@@ -29,6 +29,8 @@ Current stream support (X means supported)
 | Alpha GR | X | X |
 | Alpha CY | X | X |
 | Sigma | X | X |
-| Dailymotion | X | X |
-| Skai | WIP | X |
-| Euronews | X | X |
+| Dailymotion* | X | X |
+| Skai | Χ | X |
+| Euronews* | X | X |
+
+* These plugins are the exact same as the official ones with the addition of the parse_hls option
