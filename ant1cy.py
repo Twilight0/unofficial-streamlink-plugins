@@ -3,6 +3,7 @@ import re
 
 from distutils.util import strtobool
 from streamlink.plugin import Plugin, PluginArguments, PluginArgument
+from streamlink.compat import parse_qsl, urlparse
 from streamlink.stream import HLSStream, HTTPStream
 from streamlink.plugin.api.useragents import CHROME
 from streamlink.plugin.api.utils import itertags
@@ -31,11 +32,11 @@ class Ant1Cy(Plugin):
             live = False
             self.url = self.url.replace('episodeinner', 'episodes').replace('showID', 'show')
 
-        get_page = self.session.http.get(self.url, headers=headers)
+        res = self.session.http.get(self.url, headers=headers)
 
         if live:
 
-            tags = list(itertags(get_page.text, 'script'))
+            tags = list(itertags(res.text, 'script'))
 
             tag = [i for i in tags if 'm3u8' in i.text][0].text
 
@@ -48,7 +49,13 @@ class Ant1Cy(Plugin):
 
         else:
 
-            m3u8 = re.search(r"&quot;(http.+?master\.m3u8)&quot;", get_page.text).group(1)
+            eid = dict(parse_qsl(urlparse(self.url).query))['episodeID']
+
+            tags = [i for i in list(itertags(res.text, 'a')) if eid in i.attributes.get('data-innerurl', '')]
+
+            tag = tags[0].attributes.get('data-video')
+
+            m3u8 = re.search(r"&quot;(http.+?master\.m3u8)&quot;", tag).group(1)
 
         stream = self.session.http.get(self._api_url.format(m3u8), headers=headers).text
 
