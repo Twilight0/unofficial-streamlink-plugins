@@ -14,7 +14,7 @@ Or here via an option:
 
 But you can use `.streamlinkrc` as well
 
-[========]
+------------
 
 Current stream support (X means supported)
 
@@ -32,5 +32,6 @@ Current stream support (X means supported)
 | Dailymotion* | X | X |
 | Skai | Χ | X |
 | Euronews* | X | X |
+| Clipwatching | N/A | X |
 
 * These plugins are the exact same as the official ones with the addition of the parse_hls option
